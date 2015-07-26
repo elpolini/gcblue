@@ -29,6 +29,7 @@
         <text value="ERPpeak_dBW" label="ERP Peak (dBW)" proportion="0" tooltip="10log10(peak transmit power W) + antenna gain"></text>
         <text value="ERPaverage_dBW" label="ERP Average (dBW)" proportion="0" tooltip="10log10(average transmit power W) + antenna gain"></text>
         <text value="MaxFireControlTracks" label="MaxFireControlTracks" proportion="0"></text>
+        <text value="MaxFireControlTracksGun" label="MaxFireControlTracksGun" proportion="0"></text>
         <checkbox value="IsSemiactive" label="IsSemiactive" proportion="0"></checkbox>
         <text value="BlindSpeed_mps" label="BlindSpeed_mps" proportion="0"></text>
         <text value="LookdownWater_dB" label="LookdownWater_dB" proportion="0"></text>
@@ -42,5 +43,26 @@
         <checkbox value="DetectsGround" label="DetectsGround" proportion="0"></checkbox>
         <calc type="radar" subtype="gain" label="radar calc" proportion="0"></calc>
         <calc type="radar" subtype="losses" label="radar calc" proportion="0"></calc>
+    </sizer>
+    <sizer orientation="vertical" proportion="1">
+        <text value="Freq_Confirmed" label="Frequency_Data" proportion="0"></text>
+        <text value="Peak_Power_Confirmed" label="Peak_Power_Data" proportion="0"></text>
+        <text value="PRF_Confirmed" label="PRF_Data" proportion="0"></text>
+        <text value="PulseWidth_Confirmed" label="Pulse_Width_Data" proportion="0"></text>
+        <text value="PulseCompression_Confirmed" label="Pulse_Compression_Data" proportion="0"></text>
+        <number value="PulseRepFreq1" label="Pulse_Repetition_Rate_m1" proportion="0"></number>
+        <number value="PulseWidth1" label="Pulse_Width_m1(µs)" proportion="0"></number>
+        <number value="PulseCompression1" label="Pulse_Compression_m1" decimal_places="0" proportion="0"></number>
+        <number value="PulseRepFreq2" label="Pulse_Repetition Rate_m2" proportion="0"></number>
+        <number value="PulseWidth2" label="Pulse_Width_m2(µs)" proportion="0"></number>
+        <number value="PulseCompression2" label="Pulse_Compression_m2" decimal_places="0" proportion="0"></number>
+        <number value="PulseRepFreq3" label="Pulse_Repetition Rate_m3" proportion="0"></number>
+        <number value="PulseWidth3" label="Pulse_Width_m3(µs)" proportion="0"></number>
+        <number value="PulseCompression3" label="Pulse_Compression_m3" decimal_places="0" proportion="0"></number>
+        <number value="PulseRepFreq4" label="Pulse_Repetition Rate_m4" proportion="0"></number>
+        <number value="PulseWidth4" label="Pulse_Width_m4(µs)" proportion="0"></number>
+        <number value="PulseCompression4" label="Pulse_Compression_m4" decimal_places="0" proportion="0"></number>
+        <number value="ClutterRejectLand_dB" label="Clutter_Suppression:Land(dB)" proportion="0"></number>
+        <number value="ClutterRejectSea_dB" label="Clutter_Suppression:Sea(dB)" proportion="0"></number>
     </sizer>
 </form>

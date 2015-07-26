@@ -1,3 +1,5 @@
 // column label,column value pairs for platform_sensor table
 Sensor Class,SensorClass
 Az [deg],SensorAz
+Offset [m], Sensor_Height_Offset_m
+Setup Time [s], setup_time_sec

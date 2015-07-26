@@ -130,6 +130,7 @@ protected:
 
     static float lastTargetRCS_dBsm; ///< target RCS from last call to CanDetectTarget
     static float last_snr_margin_dB; ///< [dB] from last call to CanDetectTarget
+    static float last_cnr_margin_dB; ///< [dB] from last call to CanDetectTarget
     static float lastTargetElevation_rad; ///< [rad] from last call to TargetInElevationCoverage
 
     float CalculateJammingDegradation();
@@ -137,7 +138,7 @@ protected:
     float CalculateTargetRCS_dBsm(const tcGameObject* target, float& targetAz_rad, float& targetHeight_m) const;
     bool TargetInElevationCoverage(const tcGameObject* target, float targetRange_km, float& targetEl_rad) const;
     bool TargetInElevationCoverageWeapon(const tcGameObject* target, float targetRange_km, float& targetEl_rad) const;
-    float CalculateClutterAdjustment_dB(const tcGameObject* target, float targetEl_rad) const;
+	float CalculateClutterMargin_dB(const tcGameObject* target, float range_km, float margin_dB) const;
 
     void RemoveAllJammers();
     void UpdateJammingDegradation();

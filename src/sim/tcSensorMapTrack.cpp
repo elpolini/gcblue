@@ -1466,7 +1466,7 @@ void tcSensorMapTrack::UpdateTrack(double tCoast_s)
         if ((report->validFlags & tcSensorReport::ALT_VALID) != 0)
         {
             float inv_alt_variance = 1.0f / predicted.altVariance;
-            alt_estimate += inv_alt_variance * predicted.altEstimate_m;
+            alt_estimate += std::max(inv_alt_variance * predicted.altEstimate_m,0.0f);  //force it to be at least zero, given the assert that validates as such.
             invAltVarSum += inv_alt_variance;
             nAltReports++;
 

@@ -52,7 +52,6 @@ tcSensorState* tcRadarDBObject::CreateSensor(tcGameObject* parent)
 {
     tcRadar* radar = new tcRadar(this);
 	radar->SetParent(parent);
-	
 	return radar;
 }
 
@@ -179,10 +178,11 @@ void tcRadarDBObject::AddSqlColumns(std::string& columnString)
 	columnString +=  "ERPpeak_dBW number(3),";
     columnString +=  "ERPaverage_dBW number(3),";
 	columnString +=  "MaxFireControlTracks number(3),";
+	columnString +=  "MaxFireControlTracksGun number(3),";
 	columnString +=  "IsSemiactive number(1),";
-    columnString +=  "BlindSpeed_mps number(5),";
-    columnString +=  "LookdownWater_dB number(3),";
-    columnString +=  "LookdownLand_dB number(3),";
+    columnString +=  "BlindSpeed_mps number(5),";   //should expose the MTI reduction as well, and rename this, it behaves like MTI suppression, not a blindspeed.
+    columnString +=  "LookdownWater_dB number(3),"; //deprecated - replaced with full clutter calculation
+    columnString +=  "LookdownLand_dB number(3),"; //deprecated - replaced with full clutter calculation
     columnString +=  "Bandwidth_Hz numeric,";
     columnString +=  "AzimuthBeamwidth_deg numeric,";
     columnString +=  "ElevationBeamwidth_deg number(4),";
@@ -191,6 +191,27 @@ void tcRadarDBObject::AddSqlColumns(std::string& columnString)
 	columnString +=  "DetectsAir number(1),";
 	columnString +=  "DetectsMissile number(1),";
 	columnString +=  "DetectsGround number(1)";
+	// db Data extension:  keeping extensive data in the database, some necessary, some just to keep for potential future usage.
+	columnString += "Freq_Confirmed text";
+	columnString += "Peak_Power_W number(9)";			//radar peak power, watts
+	columnString += "Peak_Power_Confirmed text";
+	columnString += "PulseRepFreq1 numeric";		//mode1 pulse rate
+	columnString += "PulseWidth1 numeric";			//mode1 pulse width
+	columnString += "PulseCompression1 numeric";	//mode1 pulse compression
+	columnString += "PulseRepFreq2 numeric";		//mode1 pulse rate
+	columnString += "PulseWidth2 numeric";			//mode1 pulse width
+	columnString += "PulseCompression2 numeric";	//mode1 pulse compression
+	columnString += "PulseRepFreq3 numeric";		//mode1 pulse rate
+	columnString += "PulseWidth3 numeric";			//mode1 pulse width
+	columnString += "PulseCompression3 numeric";	//mode1 pulse compression
+	columnString += "PulseRepFreq4 numeric";		//mode1 pulse rate
+	columnString += "PulseWidth4 numeric";			//mode1 pulse width
+	columnString += "PulseCompression4 numeric";	//mode1 pulse compression
+	columnString += "PRF_Confirmed text";				//text data for confirmation of pulse rate data
+	columnString += "PulseWidth_Confirmed text";		//text data for confirmation of pulse width data
+	columnString += "PulseCompression_Confirmed text";	//text data for confirmation of pulse compression data
+	columnString += "ClutterRejectLand_dB numeric";			
+	columnString += "ClutterRejectSea_dB numeric";			
 }
 
 void tcRadarDBObject::ReadSql(tcSqlReader& entry)
@@ -200,6 +221,7 @@ void tcRadarDBObject::ReadSql(tcSqlReader& entry)
 	ERPpeak_dBW = entry.GetDouble("ERPpeak_dBW");
     ERPaverage_dBW = entry.GetDouble("ERPaverage_dBW");
 	maxFireControlTracks = entry.GetInt("MaxFireControlTracks");
+	maxFireControlTracksGun = entry.GetInt("MaxFireControlTracksGun");
 	isSemiactive = entry.GetInt("IsSemiactive") != 0;
     blindSpeed_mps = entry.GetDouble("BlindSpeed_mps");
     lookdownWater_dB = entry.GetDouble("LookdownWater_dB");
@@ -213,7 +235,28 @@ void tcRadarDBObject::ReadSql(tcSqlReader& entry)
 	mbDetectsMissile = entry.GetInt("DetectsMissile") != 0;
 	mbDetectsGround = entry.GetInt("DetectsGround") != 0;
 
-    CalculateParams();
+	ConfirmedFreq = entry.GetString("Freq_Confirmed").c_str();
+	PeakPower_W = entry.GetDouble("Peak_Power_W");
+	ConfirmedPeakPower = entry.GetString("Peak_Power_Confirmed").c_str();
+	PRF1 = entry.GetInt("PulseRepFreq1");
+	PW1 = entry.GetInt("PulseWidth1");
+	PC1 = entry.GetInt("PulseCompression1");
+	PRF2 = entry.GetInt("PulseRepFreq2");
+	PW2 = entry.GetInt("PulseWidth2");
+	PC2 = entry.GetInt("PulseCompression2");
+	PRF3 = entry.GetInt("PulseRepFreq3");
+	PW3 = entry.GetInt("PulseWidth3");
+	PC3 = entry.GetInt("PulseCompression3");
+	PRF4 = entry.GetInt("PulseRepFreq4");
+	PW4 = entry.GetInt("PulseWidth4");
+	PC4 = entry.GetInt("PulseCompression4");
+	ConfirmedPRF = entry.GetString("PRF_Confirmed").c_str();
+	ConfirmedPulseWidth = entry.GetString("PulseWidth_Confirmed").c_str();
+	ConfirmedPulseCompression = entry.GetString("PulseCompression_Confirmed").c_str();
+	ClutterRejectLand = entry.GetDouble("ClutterRejectLand_dB");
+	ClutterRejectSea = entry.GetDouble("ClutterRejectSea_dB");
+	
+	CalculateParams();
 }
 
 void tcRadarDBObject::WriteSql(std::string& valueString)
@@ -227,6 +270,7 @@ void tcRadarDBObject::WriteSql(std::string& valueString)
 	s << ERPpeak_dBW << ",";
     s << ERPaverage_dBW << ",";
 	s << (long)maxFireControlTracks << ",";
+	s << (long)maxFireControlTracksGun << ",";
 	s << (long)isSemiactive << ",";
     s << blindSpeed_mps << ",";
     s << lookdownWater_dB << ",";
@@ -239,6 +283,26 @@ void tcRadarDBObject::WriteSql(std::string& valueString)
 	s << (long)mbDetectsAir << ",";
 	s << (long)mbDetectsMissile << ",";
 	s << (long)mbDetectsGround;
+	s << ConfirmedFreq << ",";
+	s << PeakPower_W << ",";
+	s << ConfirmedPeakPower << ",";
+	s << PRF1 << ",";
+	s << PW1 << ",";
+	s << PC1 << ",";
+	s << PRF2 << ",";
+	s << PW2 << ",";
+	s << PC2 << ",";
+	s << PRF3 << ",";
+	s << PW3 << ",";
+	s << PC3 << ",";
+	s << PRF4 << ",";
+	s << PW4 << ",";
+	s << PC4 << ",";
+	s << ConfirmedPRF << ",";
+	s << ConfirmedPulseWidth << ",";
+	s << ConfirmedPulseCompression << ",";
+	s << ClutterRejectLand << ",";
+	s << ClutterRejectSea;
 
 	valueString += s.str();
 
@@ -248,6 +312,7 @@ tcRadarDBObject::tcRadarDBObject() : tcSensorDBObject(),
     ERPpeak_dBW(0),
     ERPaverage_dBW(0),
 	maxFireControlTracks(0),
+	maxFireControlTracksGun(0),
 	isSemiactive(false),
     blindSpeed_mps(0),
     lookdownWater_dB(0),
@@ -265,7 +330,23 @@ tcRadarDBObject::tcRadarDBObject() : tcSensorDBObject(),
     invElBeamwidth_deg(0),
     antennaGain(1.0f),
     antennaGain_dBi(0),
-    cpi_s(0.01f)
+    cpi_s(0.01f),
+	//clutter model
+	PeakPower_W(0),
+	PRF1(800),
+	PW1(1),
+	PC1(0),
+	PRF2(0),
+	PW2(0),
+	PC2(0),
+	PRF3(0),
+	PW3(0),
+	PC3(0),
+	PRF4(0),
+	PW4(0),
+	PC4(0),
+	ClutterRejectLand(12.0f),
+	ClutterRejectSea(12.0f)
 {
    mzClass = "Default Radar";
 }

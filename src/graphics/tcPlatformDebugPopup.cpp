@@ -245,6 +245,9 @@ void tcPlatformDebugPopup::Update()
 
 
     unsigned nSensors = platform->GetSensorCount();
+	s.Printf("Tgt Rng %.3fkm / %.3fkm  Tgt Alt %0.1fm\n", 
+			targetRange_km,sqrtf(pow(targetRange_km,2)+pow(dalt_m*.001,2)),target->mcKin.mfAlt_m);
+    infoText += s;
     for (unsigned k=0; k<nSensors; k++)
     {
         tcSensorState* sensor = platform->GetSensorMutable(k);
@@ -255,7 +258,9 @@ void tcPlatformDebugPopup::Update()
             bool detect = radar->CanDetectTarget(target, range_km);
             wxString detectText = detect ? "DET" : "XXX";
             float margin_dB = radar->last_snr_margin_dB; // SNR margin
+			float clutter_dB = radar->last_cnr_margin_dB; // CNR margin
             float jam_dB = radar->CalculateJammingDegradation2(targetAz_rad, targetEl_rad);
+			float mfsensor_height_m = radar->mfSensorHeight_m;
             float rcs_dBsm = radar->lastTargetRCS_dBsm;
             float el_deg = C_180OVERPI * radar->lastTargetElevation_rad;
 
@@ -265,13 +270,13 @@ void tcPlatformDebugPopup::Update()
             }
             else if (jam_dB == 0)
             {
-                s.Printf("%d R %.1f km %.1f dBsm %.1f deg %s %.1f dB",
-                    k, range_km, rcs_dBsm, el_deg, detectText.c_str(), margin_dB);
+                s.Printf("%d R %.1f dBsm %.1f deg %s %.1f sdB %.1f cdB %.1f h_m",
+                    k, rcs_dBsm, el_deg, detectText.c_str(), margin_dB, clutter_dB, mfsensor_height_m);
             }
             else
             {
-                s.Printf("%d R %.1f km %.1f dBsm %.1f deg %s %.1f dB JAM %.1f dB",
-                    k, range_km, rcs_dBsm, el_deg, detectText.c_str(), margin_dB, jam_dB);
+                s.Printf("%d R %.1f dBsm %.1f deg %s %.1f sdB %.1f cdB JAM %.1f dB",
+                    k, rcs_dBsm, el_deg, detectText.c_str(), margin_dB, clutter_dB, jam_dB);
             }
             infoText += s;
 
@@ -301,8 +306,8 @@ void tcPlatformDebugPopup::Update()
             }
             else
             {
-                s.Printf("%d %s %.1f km %.1f dBs %s %.1f dB\n",
-                    k, typeTag.c_str(), range_km, sig_dB, detectText.c_str(), margin_dB);
+                s.Printf("%d %s %.1f dBs %s %.1f dB %.1f h_m\n",
+                    k, typeTag.c_str(), sig_dB, detectText.c_str(), margin_dB, optical->mfSensorHeight_m);
             }
             infoText += s;
         }
@@ -320,8 +325,8 @@ void tcPlatformDebugPopup::Update()
             }
             else
             {
-                s.Printf("%d ESM %.1f km %.1f dBW %s %.1f dB\n",
-                    k, range_km, ERP_dBW, detectText.c_str(), margin_dB);
+                s.Printf("%d ESM %.1f dBW %s %.1f dB %.1f h_m\n",
+                    k, ERP_dBW, detectText.c_str(), margin_dB, esm->mfSensorHeight_m);
             }
             infoText += s;
         }
@@ -346,12 +351,19 @@ void tcPlatformDebugPopup::Update()
             }
             else
             {
-                s.Printf("%d SON %.1f km %s %.1f dB TL %.1f dB, NL %.1f, SLp %.1f, SDR %.1f km\n",
-                    k, range_km, detectText.c_str(), margin_dB, TL_dB, NL_dB, SLp, simpleDetRange_km);
+                s.Printf("%d SON %s %.1f dB TL %.1f dB, NL %.1f, SLp %.1f, SDR %.1f km\n",
+                    k, detectText.c_str(), margin_dB, TL_dB, NL_dB, SLp, simpleDetRange_km);
             }
             infoText += s;
-
         }
+//        else
+//        {
+//
+//			//ecm, clearly
+//			s.Printf("%d ECM %.1f h_m\n",
+//                    k, sensor->mfSensorHeight_m);
+//		}
+
     }
 
     GeoPoint p1;

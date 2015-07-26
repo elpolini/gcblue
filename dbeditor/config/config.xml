@@ -2,25 +2,25 @@
 <Root>
     <LastPath LastDatabasePath="D:\gcblue\database" LastDatabaseFile="database.db" LastCSVPath="D:\gcblue\dbeditor\CSV's"/>
     <PageState>
-        <Page Table="sub" ItemName="Hayashio"/>
-        <Page Table="ship" ItemName="Murasame DDG"/>
-        <Page Table="ground" ItemName="Airstrip"/>
-        <Page Table="air" ItemName="A-10A"/>
-        <Page Table="simpleair" ItemName="SH-60B"/>
-        <Page Table="radar" ItemName="Test Radar"/>
-        <Page Table="sonar" ItemName="Generic Active"/>
-        <Page Table="esm" ItemName="ESM-1"/>
-        <Page Table="ecm" ItemName="Jammer 100W"/>
-        <Page Table="optical" ItemName="Eyeball 20/20b"/>
-        <Page Table="torpedo" ItemName="RBU munition"/>
-        <Page Table="missile" ItemName="PL-7B"/>
+        <Page Table="sub" ItemName="Trafalgar SSN"/>
+        <Page Table="ship" ItemName="Oliver Hazard Perry FFGHM"/>
+        <Page Table="ground" ItemName="9K33M3 OSA-AKM"/>
+        <Page Table="air" ItemName="F-16A/B"/>
+        <Page Table="simpleair" ItemName="B-52H"/>
+        <Page Table="radar" ItemName="Romb"/>
+        <Page Table="sonar" ItemName="Type 2150 Passive"/>
+        <Page Table="esm" ItemName="SPS-N-5000"/>
+        <Page Table="ecm" ItemName="KJS-5000 ECM"/>
+        <Page Table="optical" ItemName="MSP-500"/>
+        <Page Table="torpedo" ItemName="MU-90"/>
+        <Page Table="missile" ItemName="RIM-116A RAM"/>
         <Page Table="ballistic_missile" ItemName="UGM-96A"/>
-        <Page Table="ballistic" ItemName="GBU-31B(v)2"/>
-        <Page Table="launcher_configuration" ItemName="Hedgehog"/>
-        <Page Table="stores" ItemName="Iowa Main Ammo Mag"/>
+        <Page Table="ballistic" ItemName="KAB-500Kr"/>
+        <Page Table="launcher_configuration" ItemName="RIM-116A RAM x21"/>
+        <Page Table="stores" ItemName="76mm/62 mk75 240 rounds"/>
         <Page Table="magazine_loadout" ItemName=""/>
         <Page Table="air_complement" ItemName=""/>
-        <Page Table="cm" ItemName=""/>
+        <Page Table="cm" ItemName="Dagaie D Flares"/>
         <Page Table="flightport" ItemName=""/>
         <Page Table="sonobuoy" ItemName=""/>
     </PageState>

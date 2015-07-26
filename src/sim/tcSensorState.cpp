@@ -558,6 +558,23 @@ bool tcSensorState::RandomDetect(float margin_dB)
 }
 
 /**
+* Adds randomness to detection with Pd that varies with SNR margin
+* Pd varies linearly over variable window, with Pd = 0.5 at 0 dB margin
+* @return true if detected, false otherwise
+*/
+bool tcSensorState::RandomDetect(float margin_dB, float snr_window_dB)
+{
+	if (margin_dB < -snr_window_dB){
+		return false;}
+	else if (margin_dB > snr_window_dB){
+		return true;}
+	else{
+		float rand_val = randf();
+		float detect = (margin_dB + snr_window_dB) / (2 * snr_window_dB);
+		return rand_val <= detect;}
+}
+
+/**
  *
  */
 void tcSensorState::Serialize(tcFile& file, bool mbLoad) 
@@ -622,6 +639,17 @@ void tcSensorState::SetMountAz(float az)
 {
 	mountAz_rad = az;
 }
+
+void tcSensorState::SetMountHeight(float height_m)
+{
+	mfSensorHeight_m = height_m;
+}
+
+float tcSensorState::GetMountHeight()
+{
+	return mfSensorHeight_m;
+}
+
 
 void tcSensorState::SetParent(tcGameObject* obj) 
 {

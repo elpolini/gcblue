@@ -141,6 +141,7 @@ void tcSensorPlatformDBObject::ReadSql(tcSqlReader& entry)
     sensorClass.clear();
     sensorAz.clear();
     sensorId.clear();
+    sensorHeight_m.clear();
     
     // no longer needed since all covered by platform_sensors table
     //
@@ -204,7 +205,8 @@ tcSensorPlatformDBObject::tcSensorPlatformDBObject()
 tcSensorPlatformDBObject::tcSensorPlatformDBObject(const tcSensorPlatformDBObject& obj)
 : sensorClass(obj.sensorClass),
   sensorAz(obj.sensorAz),
-  sensorId(obj.sensorId)
+  sensorId(obj.sensorId),
+  sensorHeight_m(obj.sensorHeight_m)
 {
 
 }

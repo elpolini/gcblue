@@ -583,7 +583,9 @@ void tcSensorPlatform::Init(tcSensorPlatformDBObject* obj, tcGameObject* parent)
 			tcSensorState* sensor = pSensorDBObj->CreateSensor(parent); // factory method
 			wxASSERT(sensor);
 			float lookAz_rad = C_PIOVER180 * obj->sensorAz[i];
+			float sensor_mount_height_m = obj->sensorHeight_m[i];
 			sensor->SetMountAz(lookAz_rad);
+			sensor->SetMountHeight(sensor_mount_height_m);
 			sensorState.push_back(sensor);
 		}
 		else

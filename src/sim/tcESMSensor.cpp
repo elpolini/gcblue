@@ -169,8 +169,7 @@ bool tcESMSensor::InitFromDatabase(long key)
         fprintf(stderr, "Error - tcESMSensor::InitFromDatabase - Not found in db or bad class for key\n");
         return false;
     }
-
-	mfSensorHeight_m = 10.0f;
+	//mfSensorHeight_m = 10.0f;
     mnMode = SSMODE_SURVEILLANCE;
     mbActive = true;
 
@@ -771,7 +770,7 @@ tcESMSensor::tcESMSensor(tcESMDBObject* dbObj)
 {
 	wxASSERT(dbObj);
 
-    mfSensorHeight_m = 10.0f;
+    //mfSensorHeight_m = 10.0f;
     mnMode = SSMODE_SURVEILLANCE;
     mbActive = true;
 }

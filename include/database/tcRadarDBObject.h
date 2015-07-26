@@ -44,6 +44,7 @@ namespace database
 		float ERPpeak_dBW;         ///< [dBW] effective radiated power, peak
         float ERPaverage_dBW;      ///< average ERP
 		unsigned int maxFireControlTracks; ///< max number of simultaneous fire control tracks
+		unsigned int maxFireControlTracksGun; ///< max number of simultaneous fire control tracks, gun specific, -preparing for eventual gunnery FC requirement.
 		bool isSemiactive;         ///< set true if this is a semiactive radar
         float blindSpeed_mps;      ///< targets under this radial speed suffer large detection penalty, 0 for no blind speed
         float lookdownWater_dB;    ///< adjustment for look-down performance over water, negative is penalty
@@ -65,6 +66,27 @@ namespace database
         float invElBeamwidth_deg;   ///< 1.0f / elevationBeamwidth_deg
         float cpi_s;                ///< CPI or dwell time calculated based on coverage angle and revisit period
         float jamConstant_dB;       ///< convert dB-W/m2 jam power density to J/N, assuming matched bandwidth and mainlobe
+		float PeakPower_W;			///< Peak power of radar, in watts, I needed ther data, collected it, now I'm storing it.
+		tcString ConfirmedFreq;		///< I needed ther data, collected it, now I'm storing it.
+		tcString ConfirmedPeakPower;		///< I needed ther data, collected it, now I'm storing it.
+		tcString ConfirmedPRF;		///< I needed ther data, collected it, now I'm storing it.
+		tcString ConfirmedPulseWidth;		///< I needed ther data, collected it, now I'm storing it.
+		tcString ConfirmedPulseCompression;		///< I needed ther data, collected it, now I'm storing it.
+		int PRF1;					///< pulse repetition frequency, mode1
+		float PW1;					///< pulse width, in microseconds, mode1
+		int PC1;					///< pulse compression ratio, mode 1
+		int PRF2;					///< ditto, mode2
+		float PW2;					///< ditto, mode2
+		int PC2;					///< ditto, mode2
+		int PRF3;					///< ditto, mode2
+		float PW3;					///< ditto, mode2
+		int PC3;					///< ditto, mode2
+		int PRF4;					///< ditto, mode2
+		float PW4;					///< ditto, mode2
+		int PC4;					///< ditto, mode2
+		float ClutterRejectLand;	///< land specific clutter rejection
+		float ClutterRejectSea;		///< sea specific clutter rejection
+
 
         virtual tcSensorState* CreateSensor(tcGameObject* parent); ///< factory method
         virtual const char* GetClassName() const {return "Radar";} ///< returns class name of database object

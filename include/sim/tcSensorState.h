@@ -125,7 +125,9 @@ public:
     void SetDamaged(bool state);
 	virtual void SetFireControlSensor(long id, unsigned char idx);
     void SetMountAz(float az);
-    void SetParent(tcGameObject* obj);
+	void SetParent(tcGameObject* obj);
+	void SetMountHeight(float height_m);
+	float GetMountHeight();
     virtual void Update(double t);
     int UpdateScan(double afTime);
     tcSensorState& operator=(tcSensorState& ss);
@@ -157,6 +159,7 @@ protected:
 
 
 	bool RandomDetect(float margin_dB);
+	bool RandomDetect(float margin_dB, float snr_window_dB);
     void UpdateActiveReport(tcSensorReport* report, double t, float az_rad, float range_km, float alt_m, 
         const tcSensorMapTrack* track);
     void UpdatePassiveReport(tcSensorReport* report, double t, float az_rad, float range_km,

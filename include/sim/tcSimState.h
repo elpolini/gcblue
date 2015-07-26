@@ -179,9 +179,9 @@ public:
     void ProcessLanding(tcGameObject *receiver, tcGameObject *landing_unit);
 
     bool RadarCanDetect(long anSensorKey, const tcGameObject* target,
-        tcGameObject* reference, float afSensorAz, long fcID = -1, unsigned fcIdx = 0);
+        tcGameObject* reference, float afSensorAz, float mfSensorHeight_m, long fcID = -1, unsigned fcIdx = 0);
     bool SensorCanDetect(long sensorKey, const tcGameObject* target,
-        tcGameObject* reference, float sensorAz, long fcID = -1, unsigned fcIdx = 0);
+        tcGameObject* reference, float SensorAz, float mfSensorHeight_m, long fcID = -1, unsigned fcIdx = 0);
     void RegisterChildObject(const std::string& name, tcGameObject* parent); ///< call when adding child to flightdeck
     void RemoveDestroyedObjects();
 	void RenameObject(tcGameObject* obj, const std::string& s);

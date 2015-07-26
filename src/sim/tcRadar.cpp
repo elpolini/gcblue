@@ -50,6 +50,8 @@
 #include "tcGameStream.h"
 #include "tcAllianceInfo.h"
 #include "tcEventManager.h"
+#include "tcSonarEnvironment.h"   ///  I need sea state for radar clutter
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -60,6 +62,7 @@
 
 float tcRadar::lastTargetRCS_dBsm = -88.0f;
 float tcRadar::last_snr_margin_dB = -88.0f;
+float tcRadar::last_cnr_margin_dB = -88.0f;
 float tcRadar::lastTargetElevation_rad = 1.72787596f;
 
 /**
@@ -531,22 +534,193 @@ float tcRadar::CalculateTargetRCS_dBsm(const tcGameObject* target, float& target
 /**
 * @return dB adjustment to RCS based on elevation angle to target and terrain type under target
 */
-float tcRadar::CalculateClutterAdjustment_dB(const tcGameObject* target, float targetEl_rad) const
+
+float tcRadar::CalculateClutterMargin_dB(const tcGameObject* target, float range_km, float margin_dB) const
 {
     wxASSERT(target != 0);
+	int SeaState = tcSonarEnvironment::Get()->GetSeaState();
+	float wave_height = 0.04 + 0.1 * pow(SeaState,2.1);
 
-    if (targetEl_rad > ((0.5f*C_PIOVER180)*mpDBObj->elevationBeamwidth_deg))
-    {
-        return 0;
-    }
-    else
-    {
-        bool isOverWater = (target->mcTerrain.mfHeight_m <= 0); // else over land
-        float adjustment_dB = isOverWater ? mpDBObj->lookdownWater_dB : mpDBObj->lookdownLand_dB;
+	float sensor_height = mfSensorHeight_m + parent->mcKin.mfAlt_m;
 
-        return adjustment_dB;
-    }
+    unsigned int classification = target->mpDBObject->mnType;
+    bool isSurface = ((classification & PTYPE_SURFACE) != 0) || (classification == PTYPE_AIRCM);
+	bool isGround = (classification & PTYPE_GROUND) != 0;
+    bool isSub = (classification & PTYPE_SUBSURFACE) != 0;
+	float target_alt = target->mcKin.mfAlt_m;
+	const tcAirDetectionDBObject* detectionData = dynamic_cast<const tcAirDetectionDBObject*>(target->mpDBObject);
+	float clutterBearing_rad = parent->mcKin.HeadingToRad(target->mcKin);
+    float targetRCS_dBsm = CalculateTargetRCS_dBsm(target, clutterBearing_rad, target_alt); 
+
+	float targetHeight_m = detectionData->effectiveHeight_m;
+	float tgt_rcs_m2;
+	if (isSurface){
+		float fraction = (targetHeight_m - wave_height) / std::max(targetHeight_m,1.0f);  //avoid potential div/0
+		target_alt = 0.5 * targetHeight_m;
+		tgt_rcs_m2 = pow(10,0.1 * targetRCS_dBsm) * fraction;}
+	else if (isSub){
+		float fraction = (targetHeight_m - wave_height) / std::max(targetHeight_m,1.0f);  //avoid potential div/0
+		target_alt = 0.5 * targetHeight_m;
+		tgt_rcs_m2 = pow(10,0.1 * targetRCS_dBsm) * fraction;}
+	else if (isGround){
+		target_alt = 0.5 * targetHeight_m;
+		tgt_rcs_m2 = pow(10,0.1 * targetRCS_dBsm);}
+	else{
+		tgt_rcs_m2 = pow(10,0.1 * targetRCS_dBsm);}
+    float tgt_theta = atan((sensor_height - target_alt) / (range_km * 1000));  //shouldn't ever div/0, will also impose min range on radar in near future, further preventing possible div/0
+
+
+	float sin_YY = std::max(0.004f,abs(sin(tgt_theta)));
+	float clutter_horizon_km = 4.121812 * pow(std::max(sensor_height,0.000001f),0.5);
+	float horizon_theta = atan(sensor_height / (clutter_horizon_km * 1000));
+    float main_clutter_range_m = pow(pow(sensor_height/tan(std::max(tgt_theta,horizon_theta)),2) + sensor_height * sensor_height, 0.5);
+
+	//find clutter point on surface.
+	float clutter_range_rad = main_clutter_range_m / 6371000;
+	float clutter_offset_lon = sinf(clutterBearing_rad) * clutter_range_rad + parent->mcKin.mfLon_rad;
+	float clutter_offset_lat = cosf(clutterBearing_rad) * clutter_range_rad + parent->mcKin.mfLat_rad;
+	float reflectivity_main;
+	float reflectivity_side;
+	float MainLobeClutter;
+	float SideLobeClutter;
+	float hbeam_r = C_DEGTORAD * mpDBObj->azimuthBeamwidth_deg;
+	float vbeam_r = C_DEGTORAD * mpDBObj->elevationBeamwidth_deg;
+
+
+
+
+	// radar mode data
+    float a = tan(0.5 * vbeam_r);
+    float b = tan(0.5 * hbeam_r);
+    float H = 2 * main_clutter_range_m * tan(0.5 * std::min(std::max(tgt_theta - horizon_theta + 0.5f * vbeam_r, 0.0f), vbeam_r));
+
+	float Unambig1 = (mpDBObj->PRF1 > 0 && mpDBObj->PW1 > 0? std::max(149896.2 * (1.0 / mpDBObj->PRF1 - mpDBObj->PW1 * 1e-006),0.0):0);
+	float Unambig2 = (mpDBObj->PRF2 > 0 && mpDBObj->PW2 > 0? std::max(149896.2 * (1.0 / mpDBObj->PRF2 - mpDBObj->PW2 * 1e-006),0.0):0);
+	float Unambig3 = (mpDBObj->PRF3 > 0 && mpDBObj->PW3 > 0? std::max(149896.2 * (1.0 / mpDBObj->PRF3 - mpDBObj->PW3 * 1e-006),0.0):0);
+	float Unambig4 = (mpDBObj->PRF4 > 0 && mpDBObj->PW4 > 0? std::max(149896.2 * (1.0 / mpDBObj->PRF4 - mpDBObj->PW4 * 1e-006),0.0):0);
+
+
+	int unambig_mod;
+	if (Unambig4 == 0){
+		if (Unambig3 == 0){
+			if (Unambig2 == 0){
+				unambig_mod = mpDBObj->mfMaxRange_km / Unambig1;}
+			else{
+				unambig_mod = mpDBObj->mfMaxRange_km / Unambig2;}}
+		else{
+			unambig_mod = mpDBObj->mfMaxRange_km / Unambig3;}}
+	else{
+		unambig_mod = mpDBObj->mfMaxRange_km / Unambig4;}
+			
+	Unambig1 *= unambig_mod;
+	Unambig2 *= unambig_mod;
+	Unambig3 *= unambig_mod;
+	Unambig4 *= unambig_mod;
+	float prf;
+	float pw;
+	int pc;
+	if (range_km < Unambig4){
+		prf = mpDBObj->PRF4;
+		pw = mpDBObj->PW4 * 1e-006;
+		pc = mpDBObj->PC4;}
+	else if (range_km < Unambig3){
+		prf = mpDBObj->PRF3;
+		pw = mpDBObj->PW3 * 1e-006;
+		pc = mpDBObj->PC3;}
+	else if (range_km < Unambig2){
+		prf = mpDBObj->PRF2;
+		pw = mpDBObj->PW2 * 1e-006;
+		pc = mpDBObj->PC2;}
+	else{
+		prf = mpDBObj->PRF1;
+		pw = mpDBObj->PW1 * 1e-006;
+		pc = mpDBObj->PC1;}
+
+	pc = std::max(pc, 1); //do not permit pc to be zero.
+
+	float rejection;
+	// mainlobe clutter criteria
+	float main_terrain_alt = tcMapData::Get()->GetTerrainHeightHighRes(C_180OVERPI*clutter_offset_lon, C_180OVERPI*clutter_offset_lat);
+	float center_freq = (mpDBObj->minFrequency_Hz + mpDBObj->maxFrequency_Hz) * 0.5f;
+	float reflectivity = pow(10,0.1*(6 * SeaState - 10 * log10(299792485 / center_freq) - 48));
+	if (tcMapData::Get()->GetTerrainHeightHighRes(C_180OVERPI*clutter_offset_lon, C_180OVERPI*clutter_offset_lat) > 0){
+		//clutter point is on land.
+		reflectivity_main = 0.128132803 * sin_YY;    // averaged value for various terrain types  someday replace with attempt to determine terrain type/roughness
+		rejection = mpDBObj->ClutterRejectLand;}
+	else{
+		//clutter point is at sea.
+		int SeaState = tcSonarEnvironment::Get()->GetSeaState();
+		reflectivity_main = reflectivity * sin_YY;
+		rejection = mpDBObj->ClutterRejectSea;}
+	float pulse_compressed_length = 299792458 * pw / pc;
+    float pulse_ground_length = pulse_compressed_length / cos(atan((sensor_height - target_alt) / (range_km * 1000)));
+    float pulse_height_far = 2 * tan(0.5 * vbeam_r) * (main_clutter_range_m + pulse_compressed_length);
+    float pulse_diagonal_length = pow(pulse_height_far * pulse_height_far + pulse_compressed_length * pulse_compressed_length,0.5);
+	float mA = a * main_clutter_range_m;
+	float mB = b * main_clutter_range_m;
+	float x;
+	float y;
+	float area_of_partially_illuminated_beam_ellipse;
+	float illuminated_area;
+    if (pulse_diagonal_length < pulse_ground_length || H == 0){
+		//beam limited
+		mA *= 2;
+		mB *= 2;
+		area_of_partially_illuminated_beam_ellipse = (0.25 * mA * mB) * (acos(1 - 2 * H / mA) - (1 - 2 * H / mA) * pow(4 * H / mA - 4 * H * H/(mA * mA) , 0.5));
+		if (area_of_partially_illuminated_beam_ellipse == 0){
+			area_of_partially_illuminated_beam_ellipse = pow(10,-9.9);}
+		MainLobeClutter = area_of_partially_illuminated_beam_ellipse;
+		}
+    else{
+		//pulse limited
+		y = -mA + H;  //horizon altitude, releative to beam aimpoint.
+		if (abs(y) < mA)  //the horizon is within the beam, determine the width at the relevant point.
+			if (y == 0){
+				x = 2 * pow(((1 - 0 / (mA * mA)) * mB * mB),0.5);}
+			else{
+				x = 2 * pow(((1 - (y * y) / (mA * mA)) * mB * mB),0.5);}
+		else{
+			//  #the horizon is above the beam, use the widest extent of the beam
+			x = 2 * mB;}
+		illuminated_area = x * pulse_ground_length;
+		MainLobeClutter = illuminated_area;}
+	MainLobeClutter *= reflectivity_main / (1.7689 * sin_YY) * pow(10, -0.1 * rejection);
+	float MainLobe_Factor;
+    if (MainLobeClutter == 0){
+		MainLobe_Factor = 0;}
+    else{
+		MainLobe_Factor = pow(main_clutter_range_m,4) / MainLobeClutter;}
+
+
+
+
+	// sidelobe clutter criteria
+
+	float side_terrain_alt = tcMapData::Get()->GetTerrainHeightHighRes(C_180OVERPI*parent->mcKin.mfLon_rad, C_180OVERPI*parent->mcKin.mfLat_rad);
+	if (tcMapData::Get()->GetTerrainHeightHighRes(C_180OVERPI*parent->mcKin.mfLon_rad, C_180OVERPI*parent->mcKin.mfLat_rad) > 0){
+		//clutter point is on land.
+		reflectivity_side = 0.1281328;    // averaged value for various terrain types  someday replace with attempt to determine terrain type/roughness
+		rejection = mpDBObj->ClutterRejectLand;}
+	else{
+		//clutter point is at sea.
+		reflectivity_side = reflectivity;
+		rejection = mpDBObj->ClutterRejectSea;}
+	float sA = sensor_height * tan(C_DEGTORAD * mpDBObj->azimuthBeamwidth_deg);
+    float sB = sensor_height * tan(C_DEGTORAD * mpDBObj->elevationBeamwidth_deg);
+    SideLobeClutter = 0.25 * C_PI * sA * sB;
+	SideLobeClutter *= reflectivity_side * pow(10, mpDBObj->effectiveSidelobes_dB * 0.1) * pow(10,-rejection * 0.1) / 1.7689;
+    float SideLobe_Factor = pow(sensor_height,4) / SideLobeClutter;
+
+
+
+    float Target_Factor = tgt_rcs_m2 / pow(range_km * 1000,4);
+
+	float CNR = Target_Factor * (MainLobe_Factor + SideLobe_Factor);
+	float clutter_margin_dB = 10 * log10(CNR);
+	last_cnr_margin_dB = clutter_margin_dB;
+	return clutter_margin_dB;
 }
+
 
 /**
 * @return true if target within elevation coverage of radar
@@ -699,8 +873,8 @@ bool tcRadar::CanDetectTarget(const tcGameObject* target, float& range_km, bool 
         if (!bInSearchVolume) {range_km=0;return false;}
     }
 
-    float clutterHorizon_km = C_RADARHOR * sqrtf(rdr_kin->mfAlt_m + mfSensorHeight_m); // break up radar horizon for clutter degradation calc later
-    float fRadarHorizon = C_RADARHOR*sqrtf(targetHeight_m) + clutterHorizon_km;
+    //float clutterHorizon_km = C_RADARHOR * sqrtf(rdr_kin->mfAlt_m + mfSensorHeight_m); // break up radar horizon for clutter degradation calc later
+    float fRadarHorizon = C_RADARHOR*(sqrtf(targetHeight_m) + sqrtf(rdr_kin->mfAlt_m + mfSensorHeight_m));
 
     fTargetRange_km = C_RADTOKM*nsNav::GCDistanceApprox_rad(rdr_kin->mfLat_rad, rdr_kin->mfLon_rad,
 		tgt_kin->mfLat_rad,tgt_kin->mfLon_rad, rdr_kin->mfAlt_m, tgt_kin->mfAlt_m);
@@ -716,14 +890,6 @@ bool tcRadar::CanDetectTarget(const tcGameObject* target, float& range_km, bool 
     bool inElevationCoverage = TargetInElevationCoverage(target, fTargetRange_km, targetEl_rad);
 
     if (!inElevationCoverage || !HasLOS(target)) return false;
-
-    // adjustment for "look-down" geometry, can also apply to targets near horizon for surface based radars
-    if (fTargetRange_km <= clutterHorizon_km)
-    {
-        float clutterAdjustment_dB = CalculateClutterAdjustment_dB(target, targetEl_rad);
-        rcs_dBsm += clutterAdjustment_dB;
-        lastTargetRCS_dBsm = rcs_dBsm;
-    }
 
     bool bTargetTypeMatch = (mpDBObj->mbDetectsAir && isAir) ||
 		(mpDBObj->mbDetectsMissile && isMissile) ||
@@ -759,15 +925,19 @@ bool tcRadar::CanDetectTarget(const tcGameObject* target, float& range_km, bool 
 
     margin_dB = margin_dB - targetJammingDegradation_dB;
     last_snr_margin_dB = margin_dB;
-
+	float clutter_margin_dB = CalculateClutterMargin_dB(target, range_km, margin_dB);
     // don't do random detections for missiles (problem where launched with lock that disappears in transition region)
     if (((mnMode == SSMODE_SURVEILLANCE) || (mnMode == SSMODE_SEEKERSEARCH)) && useRandom)
     {
-        return RandomDetect(margin_dB);
+		float s_margin = margin_dB >= 3? 1:margin_dB <= -3? 0:(margin_dB + 3.0f)/6.0f;
+		float c_margin = clutter_margin_dB >= 20? 1:clutter_margin_dB <= -20? 0:(clutter_margin_dB + 20.0f)/40.0f;
+		return randf() <= s_margin * c_margin;
+//		bool detect = RandomDetect(margin_dB) && RandomDetect(clutter_margin_dB, 20);  wasn't functioning correctly for some reason
+//        return detect;
     }
     else
     {
-        return margin_dB >= 0;
+        return margin_dB >= 0 && clutter_margin_dB >= -6.67f;
     }
 }
 
@@ -1430,9 +1600,7 @@ tcRadar::tcRadar(tcRadarDBObject* dbObj)
     else
     {
         mnMode = SSMODE_FC; // do not do surveillance updates
-    }
-
-    mfSensorHeight_m = 10.0f;
+    }	
 }
 
 /**

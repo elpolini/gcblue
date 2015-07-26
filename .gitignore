@@ -55,3 +55,10 @@ dbeditor/CSV's/weapon_damage.csv
 dbeditor/config/config.xml
 dbeditor/config/config.xml
 xml/options.xml
+dbeditor/database_setup_errors.txt
+*.dat
+*.7z
+xml/options.xml
+xml/options.xml
+xml/options.xml
+xml/options.xml

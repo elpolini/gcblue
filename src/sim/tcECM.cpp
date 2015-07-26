@@ -174,7 +174,7 @@ bool tcECM::InitFromDatabase(long key)
         return false;
     }
 
-	mfSensorHeight_m = 10.0f;
+	//mfSensorHeight_m = 10.0f;
     mnMode = 0;
     mbActive = false;
 
@@ -411,7 +411,7 @@ tcECM::tcECM(tcECMDBObject* dbObj)
 {
 	wxASSERT(dbObj);
 
-    mfSensorHeight_m = 10.0f;
+    //mfSensorHeight_m = 10.0f;
     mnMode = 0;
     mbActive = false; // 7NOV2010 changed default to inactive
 }

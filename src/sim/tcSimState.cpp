@@ -239,7 +239,7 @@ void tcSimState::ResyncObjAlliance()
 * @param fcIdx index of fire control sensor on fc platform (for semi-active)
 */
 bool tcSimState::RadarCanDetect(long anSensorKey, const tcGameObject* target,
-                                tcGameObject* reference, float afSensorAz,
+                                tcGameObject* reference, float afSensorAz, float mfSensorHeight_m,
                                 long fcID, unsigned fcIdx) 
 {
     float fRange_km;
@@ -251,6 +251,7 @@ bool tcSimState::RadarCanDetect(long anSensorKey, const tcGameObject* target,
     mcDefaultRadar.SetActive(true);
     mcDefaultRadar.SetParent(reference);
 	mcDefaultRadar.SetMountAz(afSensorAz);
+	mcDefaultRadar.SetMountHeight(mfSensorHeight_m);
 
     if (mcDefaultRadar.IsSemiactive() || mcDefaultRadar.IsCommandReceiver())
     {
@@ -261,7 +262,7 @@ bool tcSimState::RadarCanDetect(long anSensorKey, const tcGameObject* target,
 }
 
 bool tcSimState::SensorCanDetect(long sensorKey, const tcGameObject* target,
-					 tcGameObject* reference, float sensorAz, long fcID, unsigned fcIdx)
+					 tcGameObject* reference, float sensorAz, float mfSensorHeight_m, long fcID, unsigned fcIdx)
 {
     if (target == 0) return false;
 
@@ -302,6 +303,7 @@ bool tcSimState::SensorCanDetect(long sensorKey, const tcGameObject* target,
 		sensor->SetActive(true);
 		sensor->SetParent(reference);
 		sensor->SetMountAz(sensorAz);
+		sensor->SetMountHeight(mfSensorHeight_m);
         sensor->mnMode = SSMODE_SEEKERSEARCH; ///< something other than surveillance to avoid random detection
 		
 		float range_km;

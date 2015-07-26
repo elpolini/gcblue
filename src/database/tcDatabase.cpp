@@ -843,6 +843,7 @@ void tcDatabase::LoadPlatformTables()
             // clear old info
             sensorPlatData->sensorClass.clear();
             sensorPlatData->sensorAz.clear();
+            sensorPlatData->sensorHeight_m.clear();
 
             // add sensors
             wxString command = 
@@ -854,9 +855,11 @@ void tcDatabase::LoadPlatformTables()
             {
                 std::string sensorClass = tableData.getstring(1);
                 float sensorAz = tableData.getdouble(2);
+                float sensorHeight_m = tableData.getdouble(3);
 
                 sensorPlatData->sensorClass.push_back(sensorClass);
                 sensorPlatData->sensorAz.push_back(sensorAz);
+                sensorPlatData->sensorHeight_m.push_back(sensorHeight_m);
             }
         }
 
@@ -1374,6 +1377,7 @@ void tcDatabase::LoadRecordOtherTables(long key)
         // clear old info
         sensorPlatData->sensorClass.clear();
         sensorPlatData->sensorAz.clear();
+        sensorPlatData->sensorHeight_m.clear();
 
         // add sensors
         wxString command = 
@@ -1385,9 +1389,11 @@ void tcDatabase::LoadRecordOtherTables(long key)
         {
             std::string sensorClass = tableData.getstring(1);
             float sensorAz = tableData.getdouble(2);
+            float sensor_height_m = tableData.getdouble(3);
 
             sensorPlatData->sensorClass.push_back(sensorClass);
             sensorPlatData->sensorAz.push_back(sensorAz);
+            sensorPlatData->sensorHeight_m.push_back(sensor_height_m);
         }
     } // if (tcSensorPlatformDBObject* sensorPlatData = 
 
@@ -2161,7 +2167,7 @@ void tcDatabase::ExportPlatformTables()
     FILE* fid_magazine = fopen("database\\platform_mag.csv", "wt");
 
     fprintf(fid_launcher, "DatabaseClass,LauncherClass,LocalName\n");
-    fprintf(fid_sensor, "DatabaseClass,SensorClass,SensorAz\n");
+    fprintf(fid_sensor, "DatabaseClass,SensorClass,SensorAz,Sensor_Height_Offset_m,setup_time_sec\n");
     fprintf(fid_magazine, "DatabaseClass,MagazineClass\n");
 
 
@@ -2206,8 +2212,8 @@ void tcDatabase::ExportPlatformTables()
             {
                 for (size_t k=0; k<nSensors; k++)
                 {
-                    fprintf(fid_sensor, "%s,%s,%f\n", obj->mzClass.c_str(), 
-                        sensorPlatData->sensorClass[k].c_str(), sensorPlatData->sensorAz[k]);
+                    fprintf(fid_sensor, "%s,%s,%f,%f\n", obj->mzClass.c_str(), 
+                        sensorPlatData->sensorClass[k].c_str(), sensorPlatData->sensorAz[k], sensorPlatData->sensorHeight_m[k]);
                 }
             }
 

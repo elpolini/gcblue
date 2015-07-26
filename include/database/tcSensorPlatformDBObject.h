@@ -58,6 +58,8 @@ namespace database
         
 		std::vector<long> sensorId; ///< database id's of sensors
         std::vector<float> sensorAz; ///< pointing angles of sensors in degrees
+        std::vector<float> sensorHeight_m; ///< height of sensor in meters
+
 
 
         virtual const char* GetClassName() const {return "Generic";} ///< returns class name of database object

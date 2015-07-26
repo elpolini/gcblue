@@ -283,7 +283,7 @@ bool tcOpticalSensor::InitFromDatabase(long key)
         return false;
     }
 
-	mfSensorHeight_m = 10.0f;
+	//mfSensorHeight_m = 10.0f;
     mnMode = SSMODE_SURVEILLANCE;
     mbActive = true;
 
@@ -751,7 +751,7 @@ tcOpticalSensor::tcOpticalSensor(tcOpticalDBObject* dbObj)
 	wxASSERT(dbObj);
 
     mnMode = dbObj->isSurveillance ? SSMODE_SURVEILLANCE : SSMODE_FC;
-    mfSensorHeight_m = 10.0f;
+    //mfSensorHeight_m = 10.0f;
 	mbActive = true; // optical defaults to always on
 
     if (!dbObj->isDesignator)
