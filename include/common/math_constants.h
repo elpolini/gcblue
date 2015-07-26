@@ -73,8 +73,8 @@
 #define C_MTOFT 3.2808399f
 #define C_MTOMI 0.000621371f
 #define C_FTTOM 0.30480f
-#define C_RADARHOR 3.92482f ///< radar horizon in km = constant*sqrt(h in meters)
-#define C_VISUALHOR 2.78f ///< visible horizon in km = constant*sqrt(h in meters)
+#define C_RADARHOR 4.1241200f ///< radar horizon in km = constant*sqrt(h in meters) - amram, 7/25/2015: see http://www.alternatewars.com/BBOW/Radar/Radar_Horizon.htm
+#define C_VISUALHOR 3.857761f ///< visible horizon in km = constant*sqrt(h in meters) - amram, 7/25/2015: see http://www.alternatewars.com/BBOW/Radar/Radar_Horizon.htm - replace 4/3 factor with 7/6 to return optical horizon
 #define C_RADTOHRS 3.819719f
 #define C_U2GSIG 0.5773503f ///< 2/sqrt(12) factor to convert from uniform +/- error to gaussian stdev
 #define C_U2GVAR 0.3333333f ///< 1/3 = square of C_U2GSIG
