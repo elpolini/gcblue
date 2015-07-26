@@ -62,6 +62,8 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>python27.lib;boost_python-vc110-mt-gd-1_57.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wxmsw30ud_adv.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxbase30ud_net.lib;wxbase30ud_xml.lib;wxzlibd.lib;wxpngd.lib;wxjpegd.lib;wxtiffd.lib;wxexpatd.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;OpenAL32.lib;ALut.lib;oalpp_gcbd.lib;TV3D65.lib;Version.lib;gcblue-libd.lib;%(AdditionalDependencies)</AdditionalDependencies>
