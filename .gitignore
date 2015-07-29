@@ -55,3 +55,5 @@ dbeditor/CSV's/weapon_damage.csv
 dbeditor/config/config.xml
 dbeditor/config/config.xml
 xml/options.xml
+*.dat
+maps/tiles_2/tiles.7z
