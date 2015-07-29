@@ -2,11 +2,11 @@
 <Root>
     <LastPath LastDatabasePath="D:\gcblue\database" LastDatabaseFile="database.db" LastCSVPath="D:\gcblue\dbeditor\CSV's"/>
     <PageState>
-        <Page Table="sub" ItemName="Trafalgar SSN"/>
-        <Page Table="ship" ItemName="Oliver Hazard Perry FFGHM"/>
-        <Page Table="ground" ItemName="9K33M3 OSA-AKM"/>
+        <Page Table="sub" ItemName="Yushio(1987)"/>
+        <Page Table="ship" ItemName="Pr 12322 Zubr"/>
+        <Page Table="ground" ItemName="9K33M2 OSA-AK"/>
         <Page Table="air" ItemName="F-16A/B"/>
-        <Page Table="simpleair" ItemName="B-52H"/>
+        <Page Table="simpleair" ItemName="Yak-38M"/>
         <Page Table="radar" ItemName="Romb"/>
         <Page Table="sonar" ItemName="Type 2150 Passive"/>
         <Page Table="esm" ItemName="SPS-N-5000"/>

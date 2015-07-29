@@ -1,22 +1,22 @@
 <Options>
     <ViewMode Value="2" />
-    <CommandMode Value="0" />
+    <CommandMode Value="1" />
     <MapMode Value="1" />
     <FillRangeCircles Value="0" />
-    <SymbologyType Value="1" />
+    <SymbologyType Value="0" />
     <CheatMode3D Value="1" />
     <SonarRayTracingEnabled Value="1" />
     <TerrainMaskingEnabled Value="1" />
-    <AccurateCrossSectionEnabled Value="1" />
+    <AccurateCrossSectionEnabled Value="0" />
     <SurfVelocityLeader Value="3" />
     <AirVelocityLeader Value="2" />
     <DrawNavPointsMode Value="0" />
-    <FastAircraftReady Value="1" />
-    <FastMaintenance Value="1" />
-    <FastLoad Value="1" />
+    <FastAircraftReady Value="0" />
+    <FastMaintenance Value="0" />
+    <FastLoad Value="0" />
     <SoundDisabled Value="0" />
-    <MusicEnabled Value="1" />
-    <MusicVolume Value="1.000000" />
+    <MusicEnabled Value="0" />
+    <MusicVolume Value="0.500000" />
     <EffectVolume Value="1.000000" />
     <WindowedMode Value="0" />
     <Max3DRange Value="0" />
@@ -81,8 +81,8 @@
     <DisplaySettings>default</DisplaySettings>
     <UserName>Observer</UserName>
     <HostAddress>192.168.1.2</HostAddress>
-    <LastScenarioPath>SinglePlayer.ColdWar.Backfires.py</LastScenarioPath>
-    <LastScenarioName>Backfires</LastScenarioName>
+    <LastScenarioPath>NotReadySinglePlayer.Modern.Pacific_War_1_Ignition.py</LastScenarioPath>
+    <LastScenarioName>Pacific_War_1_Ignition</LastScenarioName>
     <LastScenarioExtension>py</LastScenarioExtension>
-    <ScenarioSavePath>scenarios/SinglePlayer/ColdWar/Backfires.py</ScenarioSavePath>
+    <ScenarioSavePath>scenarios/NotReadySinglePlayer/Modern/Pacific_War_1_Ignition.py</ScenarioSavePath>
 </Options>
