@@ -1119,7 +1119,7 @@ void tcGame::Update3DSize()
 		r = wxRect(startViewerPosition, startViewerSize);
 	}
 
-	viewer->Freeze();
+//	viewer->Freeze();
 	viewer->SetSize(r);
 
     if ((meGameMode == GM_PLAY) && (meScreenMode == TACTICAL))
@@ -1502,7 +1502,7 @@ void tcGame::Initialize3DViewer()
 	viewer->SetText("");
 
 	viewer->Show(FALSE);
-	viewer->Freeze();
+//	viewer->Freeze();
 
 	mb3DActive = false;
 	size3D = MODE3D_START;
