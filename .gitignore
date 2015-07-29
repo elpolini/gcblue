@@ -62,3 +62,10 @@ xml/options.xml
 xml/options.xml
 xml/options.xml
 xml/options.xml
+*.pyc
+*.xlsx
+bin/BlueIId.exe - Shortcut.lnk
+database/database_2.db
+dbeditor/CSV's/shiD829.tmp
+dbeditor/CSV's/stock platform_sensor.csv
+Dbgview.exe
