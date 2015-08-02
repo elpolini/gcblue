@@ -769,6 +769,8 @@ def Intercept(TI):
             alt = max(track.Alt + (max_range * 500),200)
             newalt = True
         
+    if UI.IsAir():
+        alt = max(alt, 20)
 
     heading_mode = range_rates[iter][2]
     if heading_mode == 0:
