@@ -840,6 +840,10 @@
     <ClInclude Include="include\ai\tcCAPMission.h" />
     <ClInclude Include="include\ai\tcMission.h" />
     <ClInclude Include="include\ai\tcMissionManager.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\gcblue.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
